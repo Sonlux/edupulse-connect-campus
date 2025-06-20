@@ -1,17 +1,17 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
-const AttendanceChart = () => {
+export const AttendanceChart = () => {
   const attendanceData = [
-    { month: 'Jan', attendance: 85 },
-    { month: 'Feb', attendance: 88 },
-    { month: 'Mar', attendance: 92 },
-    { month: 'Apr', attendance: 87 },
-    { month: 'May', attendance: 91 },
-    { month: 'Jun', attendance: 89 }
+    { month: 'Aug', percentage: 85 },
+    { month: 'Sep', percentage: 78 },
+    { month: 'Oct', percentage: 92 },
+    { month: 'Nov', percentage: 88 },
+    { month: 'Dec', percentage: 82 },
+    { month: 'Jan', percentage: 87 }
   ];
 
   return (
@@ -23,34 +23,22 @@ const AttendanceChart = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={attendanceData}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="month" />
-              <YAxis domain={[70, 100]} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="attendance" 
-                stroke="#3b82f6" 
-                strokeWidth={3}
-                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={attendanceData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Line 
+              type="monotone" 
+              dataKey="percentage" 
+              stroke="#3b82f6" 
+              strokeWidth={3}
+              dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );
 };
-
-export { AttendanceChart };

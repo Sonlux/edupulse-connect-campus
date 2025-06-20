@@ -20,6 +20,8 @@ import { AttendanceChart } from './AttendanceChart';
 import { GradeChart } from './GradeChart';
 import { ClassSchedule } from './ClassSchedule';
 import { RecentActivity } from './RecentActivity';
+import NotificationCenter from './NotificationCenter';
+import QuickActions from './QuickActions';
 
 const StudentDashboard = () => {
   const studentData = {
@@ -186,17 +188,21 @@ const StudentDashboard = () => {
           </Card>
         </div>
 
-        {/* Charts and Schedule */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <AttendanceChart />
           <GradeChart />
         </div>
 
-        <div className="mt-6">
-          <ClassSchedule />
+        {/* Quick Actions and Notifications */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <QuickActions />
+          <NotificationCenter />
         </div>
 
-        <div className="mt-6">
+        {/* Schedule and Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ClassSchedule />
           <RecentActivity />
         </div>
       </div>

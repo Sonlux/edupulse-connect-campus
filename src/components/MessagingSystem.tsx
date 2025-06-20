@@ -3,78 +3,87 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, Send, Search, Plus, User, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Avatar } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Send, 
+  Paperclip, 
+  Search, 
+  Plus, 
+  MoreVertical,
+  Star,
+  Archive,
+  Trash2
+} from 'lucide-react';
 
 const MessagingSystem = () => {
-  const [selectedConversation, setSelectedConversation] = useState('');
+  const [selectedChat, setSelectedChat] = useState(1);
   const [newMessage, setNewMessage] = useState('');
-  const [showNewConversation, setShowNewConversation] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const conversations = [
     {
-      id: '1',
-      participant: 'Alex Johnson (CS21B1045)',
-      lastMessage: 'Thank you for the clarification on the assignment.',
-      timestamp: '2024-01-15T14:30:00Z',
-      unread: 0,
-      subject: 'Database Assignment Query'
-    },
-    {
-      id: '2',
-      participant: 'Sarah Wilson (CS21B1004)',
-      lastMessage: 'Could you please explain the concept again?',
-      timestamp: '2024-01-15T11:20:00Z',
+      id: 1,
+      name: 'Dr. Sarah Smith',
+      role: 'Professor - Data Structures',
+      lastMessage: 'Assignment deadline extended to Friday',
+      time: '2 hours ago',
       unread: 2,
-      subject: 'Data Structures Help'
+      avatar: 'SS',
+      online: true
     },
     {
-      id: '3',
-      participant: 'Mike Johnson (CS21B1003)',
-      lastMessage: 'I will submit the project by tomorrow.',
-      timestamp: '2024-01-14T16:45:00Z',
+      id: 2,
+      name: 'Prof. John Doe',
+      role: 'Professor - Database Systems',
+      lastMessage: 'Great work on the project!',
+      time: '1 day ago',
       unread: 0,
-      subject: 'Project Submission'
+      avatar: 'JD',
+      online: false
+    },
+    {
+      id: 3,
+      name: 'CS Study Group',
+      role: 'Group Chat',
+      lastMessage: 'Mike: Anyone free for study session?',
+      time: '2 days ago',
+      unread: 5,
+      avatar: 'CS',
+      online: true
     }
   ];
 
   const messages = [
     {
-      id: '1',
-      senderId: 'student',
-      senderName: 'Alex Johnson',
-      content: 'Hello Professor, I have a question about the database assignment.',
-      timestamp: '2024-01-15T13:00:00Z'
+      id: 1,
+      sender: 'Dr. Sarah Smith',
+      content: 'Hi Alex, I wanted to let you know that the assignment deadline has been extended to Friday due to the technical issues we had this week.',
+      time: '2:30 PM',
+      isOwn: false
     },
     {
-      id: '2',
-      senderId: 'faculty',
-      senderName: 'Dr. Sarah Smith',
-      content: 'Hello Alex, I\'d be happy to help. What specific part are you having trouble with?',
-      timestamp: '2024-01-15T13:15:00Z'
+      id: 2,
+      sender: 'You',
+      content: 'Thank you Dr. Smith! That gives me more time to refine my solution.',
+      time: '2:32 PM',
+      isOwn: true
     },
     {
-      id: '3',
-      senderId: 'student',
-      senderName: 'Alex Johnson',
-      content: 'I\'m confused about the normalization process in the third normal form.',
-      timestamp: '2024-01-15T13:20:00Z'
+      id: 3,
+      sender: 'Dr. Sarah Smith',
+      content: 'Perfect! If you have any questions about the algorithm implementation, feel free to ask.',
+      time: '2:35 PM',
+      isOwn: false
     },
     {
-      id: '4',
-      senderId: 'faculty',
-      senderName: 'Dr. Sarah Smith',
-      content: 'Third Normal Form eliminates transitive dependencies. Let me explain with an example...',
-      timestamp: '2024-01-15T14:00:00Z'
-    },
-    {
-      id: '5',
-      senderId: 'student',
-      senderName: 'Alex Johnson',
-      content: 'Thank you for the clarification on the assignment.',
-      timestamp: '2024-01-15T14:30:00Z'
+      id: 4,
+      sender: 'You',
+      content: 'Actually, I do have a question about the binary search tree traversal. Could we schedule a quick meeting?',
+      time: '2:40 PM',
+      isOwn: true
     }
   ];
 
@@ -85,204 +94,146 @@ const MessagingSystem = () => {
     }
   };
 
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString();
-  };
+  const filteredConversations = conversations.filter(conv =>
+    conv.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Messages & Communication
-            </CardTitle>
-            <Button 
-              onClick={() => setShowNewConversation(!showNewConversation)}
-              className="gap-1"
-            >
+    <div className="h-[800px] flex border rounded-lg overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-1/3 border-r bg-gray-50">
+        <div className="p-4 border-b bg-white">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Messages</h2>
+            <Button size="sm" className="gap-1">
               <Plus className="h-4 w-4" />
-              New Conversation
+              New
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          {showNewConversation && (
-            <Card className="mb-6 border-green-200 bg-green-50">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Select Student</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose student" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="student1">John Doe (CS21B1001)</SelectItem>
-                        <SelectItem value="student2">Jane Smith (CS21B1002)</SelectItem>
-                        <SelectItem value="student3">Mike Johnson (CS21B1003)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Subject</label>
-                    <Input placeholder="Enter subject" />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="text-sm font-medium mb-2 block">Message</label>
-                  <Textarea placeholder="Type your message here..." rows={3} />
-                </div>
-                <div className="flex gap-2">
-                  <Button className="gap-1">
-                    <Send className="h-4 w-4" />
-                    Send Message
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowNewConversation(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search conversations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Conversations List */}
-            <div className="lg:col-span-1">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-4">
-                  <Search className="h-4 w-4 text-gray-500" />
-                  <Input placeholder="Search conversations..." className="flex-1" />
+        <ScrollArea className="h-full">
+          <div className="space-y-1 p-2">
+            {filteredConversations.map((conv) => (
+              <div
+                key={conv.id}
+                onClick={() => setSelectedChat(conv.id)}
+                className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                  selectedChat === conv.id ? 'bg-blue-100 border-blue-200' : 'hover:bg-white'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                      {conv.avatar}
+                    </div>
+                    {conv.online && (
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-sm truncate">{conv.name}</h3>
+                      <span className="text-xs text-gray-500">{conv.time}</span>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-1">{conv.role}</p>
+                    <p className="text-sm text-gray-700 truncate">{conv.lastMessage}</p>
+                  </div>
+                  {conv.unread > 0 && (
+                    <Badge variant="destructive" className="text-xs">
+                      {conv.unread}
+                    </Badge>
+                  )}
                 </div>
-                
-                <h3 className="font-semibold text-gray-900 mb-3">Recent Conversations</h3>
-                
-                {conversations.map(conversation => (
-                  <Card 
-                    key={conversation.id}
-                    className={`cursor-pointer transition-colors hover:bg-gray-50 ${
-                      selectedConversation === conversation.id ? 'ring-2 ring-blue-500' : ''
-                    }`}
-                    onClick={() => setSelectedConversation(conversation.id)}
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {conversation.participant.split(' (')[0]}
-                            </p>
-                            {conversation.unread > 0 && (
-                              <Badge variant="destructive" className="text-xs">
-                                {conversation.unread}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-600 mt-1">{conversation.subject}</p>
-                          <p className="text-xs text-gray-500 mt-1 truncate">
-                            {conversation.lastMessage}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-gray-400">
-                          <Clock className="h-3 w-3" />
-                          {formatTime(conversation.timestamp)}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
               </div>
-            </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
 
-            {/* Messages Area */}
-            <div className="lg:col-span-2">
-              {selectedConversation ? (
-                <Card className="h-[600px] flex flex-col">
-                  <CardHeader className="border-b">
-                    <div className="flex items-center gap-2">
-                      <User className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <h3 className="font-semibold">
-                          {conversations.find(c => c.id === selectedConversation)?.participant}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {conversations.find(c => c.id === selectedConversation)?.subject}
-                        </p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {messages.map(message => (
-                      <div 
-                        key={message.id}
-                        className={`flex ${message.senderId === 'faculty' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div 
-                          className={`max-w-[70%] p-3 rounded-lg ${
-                            message.senderId === 'faculty' 
-                              ? 'bg-blue-600 text-white' 
-                              : 'bg-gray-100 text-gray-900'
-                          }`}
-                        >
-                          <p className="text-sm">{message.content}</p>
-                          <p className={`text-xs mt-1 ${
-                            message.senderId === 'faculty' ? 'text-blue-100' : 'text-gray-500'
-                          }`}>
-                            {formatTime(message.timestamp)}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                  
-                  <div className="border-t p-4">
-                    <div className="flex gap-2">
-                      <Textarea
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type your message..."
-                        rows={2}
-                        className="flex-1"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSendMessage();
-                          }
-                        }}
-                      />
-                      <Button 
-                        onClick={handleSendMessage}
-                        disabled={!newMessage.trim()}
-                        className="gap-1"
-                      >
-                        <Send className="h-4 w-4" />
-                        Send
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ) : (
-                <Card className="h-[600px] flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Select a conversation to start messaging</p>
-                  </div>
-                </Card>
-              )}
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Chat Header */}
+        <div className="p-4 border-b bg-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+              SS
+            </div>
+            <div>
+              <h3 className="font-medium">Dr. Sarah Smith</h3>
+              <p className="text-sm text-gray-600">Professor - Data Structures</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm">
+              <Star className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <Archive className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[70%] p-3 rounded-lg ${
+                    message.isOwn
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-900'
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  <p
+                    className={`text-xs mt-1 ${
+                      message.isOwn ? 'text-blue-100' : 'text-gray-500'
+                    }`}
+                  >
+                    {message.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+
+        {/* Message Input */}
+        <div className="p-4 border-t bg-white">
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm">
+              <Paperclip className="h-4 w-4" />
+            </Button>
+            <Input
+              placeholder="Type your message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="flex-1"
+            />
+            <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

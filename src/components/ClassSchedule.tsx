@@ -1,57 +1,48 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, MapPin, Video } from 'lucide-react';
+import { Calendar, Clock, MapPin, Video, Bell } from 'lucide-react';
 
-const ClassSchedule = () => {
+export const ClassSchedule = () => {
+  const [selectedDay, setSelectedDay] = useState('today');
+
   const todaySchedule = [
-    {
-      time: "09:00 - 10:00",
-      subject: "Data Structures",
-      room: "Lab 204",
-      type: "Practical",
-      status: "ongoing"
+    { 
+      time: '09:00 - 10:00', 
+      subject: 'Data Structures', 
+      room: 'Room 201', 
+      type: 'Lecture',
+      professor: 'Dr. Sarah Smith',
+      isOnline: false,
+      isNext: true
     },
-    {
-      time: "10:15 - 11:15",
-      subject: "Database Systems",
-      room: "Room 301",
-      type: "Theory",
-      status: "upcoming"
+    { 
+      time: '10:00 - 11:00', 
+      subject: 'Database Systems', 
+      room: 'Lab 301', 
+      type: 'Practical',
+      professor: 'Prof. John Doe',
+      isOnline: false,
+      isNext: false
     },
-    {
-      time: "11:30 - 12:30",
-      subject: "Web Development",
-      room: "Lab 105",
-      type: "Practical",
-      status: "upcoming"
-    },
-    {
-      time: "14:00 - 15:00",
-      subject: "Machine Learning",
-      room: "Room 205",
-      type: "Theory",
-      status: "upcoming"
-    },
-    {
-      time: "15:15 - 16:15",
-      subject: "Software Engineering",
-      room: "Room 302",
-      type: "Theory",
-      status: "upcoming"
+    { 
+      time: '11:30 - 12:30', 
+      subject: 'Web Development', 
+      room: 'Online', 
+      type: 'Lecture',
+      professor: 'Dr. Mike Wilson',
+      isOnline: true,
+      isNext: false
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ongoing': return 'bg-green-100 text-green-800';
-      case 'upcoming': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-gray-100 text-gray-600';
-      default: return 'bg-gray-100 text-gray-600';
-    }
-  };
+  const upcomingClasses = [
+    { date: 'Tomorrow', subject: 'Computer Networks', time: '09:00 AM' },
+    { date: 'Friday', subject: 'Software Engineering', time: '10:00 AM' },
+    { date: 'Monday', subject: 'Machine Learning', time: '11:30 AM' }
+  ];
 
   return (
     <Card>
@@ -59,61 +50,65 @@ const ClassSchedule = () => {
         <CardTitle className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-purple-600" />
           Today's Schedule
-          <Badge variant="outline" className="ml-auto">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {todaySchedule.map((class_item, index) => (
+          {todaySchedule.map((cls, index) => (
             <div 
               key={index} 
-              className={`p-4 rounded-lg border-l-4 ${
-                class_item.status === 'ongoing' ? 'border-l-green-500 bg-green-50' : 
-                'border-l-blue-500 bg-blue-50'
-              } transition-all hover:shadow-md`}
+              className={`flex items-center justify-between p-4 border rounded-lg ${
+                cls.isNext ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+              }`}
             >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900">{class_item.subject}</h3>
-                    <Badge 
-                      variant="outline" 
-                      className={`text-xs ${getStatusColor(class_item.status)}`}
-                    >
-                      {class_item.status}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      {class_item.type}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {class_item.time}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {class_item.room}
-                    </div>
+              <div className="flex items-center gap-4">
+                <div className="text-center min-w-[80px]">
+                  <div className="font-bold text-sm">{cls.time.split(' - ')[0]}</div>
+                  <div className="text-xs text-gray-500">{cls.time.split(' - ')[1]}</div>
+                </div>
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2">
+                    {cls.subject}
+                    {cls.isOnline && <Video className="h-4 w-4 text-blue-500" />}
+                  </h3>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="h-3 w-3" />
+                    {cls.room} • {cls.professor}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  {class_item.status === 'ongoing' && (
-                    <Button size="sm" className="gap-1">
-                      <Video className="h-4 w-4" />
-                      Join
-                    </Button>
-                  )}
-                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant={cls.type === 'Lecture' ? 'default' : 'secondary'}>
+                  {cls.type}
+                </Badge>
+                {cls.isNext && (
+                  <Badge className="bg-green-600 text-white">
+                    Next Class
+                  </Badge>
+                )}
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Bell className="h-3 w-3" />
+                  Remind
+                </Button>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-6">
+          <h4 className="font-semibold mb-3">Upcoming Classes</h4>
+          <div className="space-y-2">
+            {upcomingClasses.map((cls, index) => (
+              <div key={index} className="flex justify-between items-center p-2 border rounded">
+                <span className="text-sm">{cls.subject}</span>
+                <div className="text-xs text-gray-500">
+                  {cls.date} at {cls.time}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 };
-
-export { ClassSchedule };
