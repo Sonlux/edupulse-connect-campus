@@ -27,7 +27,10 @@ import {
   Users,
   FileText,
   BarChart3,
-  Settings
+  Settings,
+  Building2,
+  Shield,
+  Database
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,7 +56,25 @@ const AppSidebar = () => {
     { title: 'Reports', icon: BarChart3, url: '/faculty/reports' },
   ];
 
-  const menuItems = user?.role === 'faculty' ? facultyMenuItems : studentMenuItems;
+  const adminMenuItems = [
+    { title: 'Dashboard', icon: Home, url: '/admin' },
+    { title: 'User Management', icon: Users, url: '/admin/users' },
+    { title: 'Departments', icon: Building2, url: '/admin/departments' },
+    { title: 'Courses', icon: BookOpen, url: '/admin/courses' },
+    { title: 'Academic Calendar', icon: Calendar, url: '/admin/calendar' },
+    { title: 'Reports & Analytics', icon: BarChart3, url: '/admin/reports' },
+    { title: 'System Settings', icon: Database, url: '/admin/system' },
+  ];
+
+  const getMenuItems = () => {
+    switch (user?.role) {
+      case 'admin': return adminMenuItems;
+      case 'faculty': return facultyMenuItems;
+      default: return studentMenuItems;
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   const handleLogout = () => {
     logout();
@@ -75,7 +96,10 @@ const AppSidebar = () => {
             <span className="text-sm font-medium">{user.name}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={user.role === 'faculty' ? 'default' : 'secondary'} className="text-xs">
+            <Badge variant={
+              user.role === 'admin' ? 'destructive' : 
+              user.role === 'faculty' ? 'default' : 'secondary'
+            } className="text-xs">
               {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
             </Badge>
             {user.studentId && (
@@ -83,6 +107,9 @@ const AppSidebar = () => {
             )}
             {user.facultyId && (
               <Badge variant="outline" className="text-xs">{user.facultyId}</Badge>
+            )}
+            {user.adminId && (
+              <Badge variant="outline" className="text-xs">{user.adminId}</Badge>
             )}
           </div>
         </div>

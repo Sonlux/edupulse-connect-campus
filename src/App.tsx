@@ -18,6 +18,8 @@ import Attendance from "./pages/Attendance";
 import Grades from "./pages/Grades";
 import Schedule from "./pages/Schedule";
 import Settings from "./pages/Settings";
+import AdminIndex from "./pages/AdminIndex";
+import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,10 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminIndex />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
             
             {/* Faculty Routes */}
             <Route path="/faculty" element={<FacultyIndex />} />

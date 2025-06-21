@@ -10,6 +10,7 @@ export interface User {
   role: UserRole;
   studentId?: string;
   facultyId?: string;
+  adminId?: string;
 }
 
 interface AuthContextType {
@@ -63,6 +64,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: 'faculty@example.com',
           role: 'faculty',
           facultyId: 'FAC001'
+        };
+      } else if (email === 'admin@example.com') {
+        mockUser = {
+          id: '3',
+          name: 'Admin User',
+          email: 'admin@example.com',
+          role: 'admin',
+          adminId: 'ADM001'
         };
       } else {
         throw new Error('Invalid credentials');

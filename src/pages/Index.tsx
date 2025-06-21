@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import StudentDashboard from '@/components/StudentDashboard';
 import FacultyDashboard from '@/components/FacultyDashboard';
+import AdminDashboard from '@/components/AdminDashboard';
 import LoginForm from '@/components/LoginForm';
 
 const Index = () => {
@@ -22,6 +23,14 @@ const Index = () => {
 
   if (!user) {
     return <LoginForm />;
+  }
+
+  if (user.role === 'admin') {
+    return (
+      <DashboardLayout allowedRoles={['admin']}>
+        <AdminDashboard />
+      </DashboardLayout>
+    );
   }
 
   if (user.role === 'faculty') {
