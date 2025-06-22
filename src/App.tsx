@@ -20,6 +20,12 @@ import Schedule from "./pages/Schedule";
 import Settings from "./pages/Settings";
 import AdminIndex from "./pages/AdminIndex";
 import AdminUsers from "./pages/AdminUsers";
+import AdminDepartments from "./pages/AdminDepartments";
+import AdminCourses from "./pages/AdminCourses";
+import AdminCalendar from "./pages/AdminCalendar";
+import AdminReports from "./pages/AdminReports";
+import AdminSystem from "./pages/AdminSystem";
+import AdminNotifications from "./pages/AdminNotifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +43,12 @@ const App = () => (
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminIndex />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/departments" element={<AdminDepartments />} />
+            <Route path="/admin/courses" element={<AdminCourses />} />
+            <Route path="/admin/calendar" element={<AdminCalendar />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
+            <Route path="/admin/system" element={<AdminSystem />} />
+            <Route path="/admin/notifications" element={<AdminNotifications />} />
             
             {/* Faculty Routes */}
             <Route path="/faculty" element={<FacultyIndex />} />

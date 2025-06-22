@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   BookOpen, 
@@ -16,10 +17,13 @@ import {
   Settings,
   BarChart3,
   FileText,
-  School
+  School,
+  Bell,
+  Mail
 } from 'lucide-react';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats] = useState({
     totalStudents: 1245,
     totalFaculty: 87,
@@ -28,16 +32,17 @@ const AdminDashboard = () => {
     activeAssignments: 34,
     pendingApprovals: 8,
     newEnrollments: 23,
-    systemAlerts: 3
+    systemAlerts: 3,
+    unreadNotifications: 12
   });
 
   const quickActions = [
-    { icon: UserPlus, label: 'Add New User', color: 'bg-blue-500', path: '/admin/users/new' },
+    { icon: UserPlus, label: 'Add New User', color: 'bg-blue-500', path: '/admin/users' },
     { icon: BookOpen, label: 'Manage Courses', color: 'bg-green-500', path: '/admin/courses' },
     { icon: Building2, label: 'Departments', color: 'bg-purple-500', path: '/admin/departments' },
     { icon: Calendar, label: 'Academic Calendar', color: 'bg-orange-500', path: '/admin/calendar' },
     { icon: FileText, label: 'Generate Reports', color: 'bg-indigo-500', path: '/admin/reports' },
-    { icon: Settings, label: 'System Settings', color: 'bg-pink-500', path: '/admin/settings' }
+    { icon: Settings, label: 'System Settings', color: 'bg-pink-500', path: '/admin/system' }
   ];
 
   const recentActivities = [
@@ -53,6 +58,14 @@ const AdminDashboard = () => {
     { id: 3, message: 'New security update available', severity: 'info' }
   ];
 
+  const handleQuickAction = (path: string) => {
+    navigate(path);
+  };
+
+  const handleNotificationCenter = () => {
+    navigate('/admin/notifications');
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -60,10 +73,25 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-600">Manage your institution efficiently</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <School className="h-4 w-4" />
-          Institution Settings
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 relative"
+            onClick={handleNotificationCenter}
+          >
+            <Bell className="h-4 w-4" />
+            Notifications
+            {stats.unreadNotifications > 0 && (
+              <Badge variant="destructive" className="absolute -top-2 -right-2 px-2 py-1 text-xs">
+                {stats.unreadNotifications}
+              </Badge>
+            )}
+          </Button>
+          <Button className="flex items-center gap-2">
+            <School className="h-4 w-4" />
+            Institution Settings
+          </Button>
+        </div>
       </div>
 
       {/* Stats Overview */}
@@ -125,6 +153,7 @@ const AdminDashboard = () => {
                 key={index}
                 variant="outline"
                 className="h-20 flex-col gap-2 hover:scale-105 transition-transform"
+                onClick={() => handleQuickAction(action.path)}
               >
                 <div className={`p-2 rounded-full ${action.color}`}>
                   <action.icon className="h-4 w-4 text-white" />
@@ -207,8 +236,8 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="text-center py-8">
                 <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4">User management interface will be implemented here</p>
-                <Button>Go to User Management</Button>
+                <p className="text-gray-600 mb-4">User management interface</p>
+                <Button onClick={() => navigate('/admin/users')}>Go to User Management</Button>
               </div>
             </CardContent>
           </Card>
@@ -223,8 +252,11 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="text-center py-8">
                 <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4">Academic management interface will be implemented here</p>
-                <Button>Go to Academic Management</Button>
+                <p className="text-gray-600 mb-4">Academic management interface</p>
+                <div className="flex gap-2 justify-center">
+                  <Button onClick={() => navigate('/admin/courses')}>Manage Courses</Button>
+                  <Button variant="outline" onClick={() => navigate('/admin/departments')}>Departments</Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -239,8 +271,8 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="text-center py-8">
                 <Settings className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4">System management interface will be implemented here</p>
-                <Button>Go to System Settings</Button>
+                <p className="text-gray-600 mb-4">System management interface</p>
+                <Button onClick={() => navigate('/admin/system')}>Go to System Settings</Button>
               </div>
             </CardContent>
           </Card>
