@@ -3,174 +3,331 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Save, Lock, Edit } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Save, 
+  Upload, 
+  Download, 
+  Search,
+  Filter,
+  CheckCircle,
+  AlertTriangle,
+  FileText
+} from 'lucide-react';
 
 const MarkEntry = () => {
-  const [selectedClass, setSelectedClass] = useState('');
-  const [selectedExam, setSelectedExam] = useState('');
-  const [marks, setMarks] = useState<Record<string, string>>({});
-  const [isLocked, setIsLocked] = useState(false);
+  const [selectedClass, setSelectedClass] = useState('CS201');
+  const [selectedAssignment, setSelectedAssignment] = useState('assignment1');
 
   const classes = [
-    { id: 'cs-a', name: 'CS-A (Data Structures)', students: 30 },
-    { id: 'cs-b', name: 'CS-B (Database Systems)', students: 32 }
+    { code: 'CS201', name: 'Data Structures', students: 50 },
+    { code: 'CS202', name: 'Database Systems', students: 45 },
+    { code: 'CS203', name: 'Web Development', students: 42 }
   ];
 
-  const examTypes = [
-    { id: 'internal1', name: 'Internal Exam 1', maxMarks: 50 },
-    { id: 'internal2', name: 'Internal Exam 2', maxMarks: 50 },
-    { id: 'assignment1', name: 'Assignment 1', maxMarks: 25 },
-    { id: 'external', name: 'External Exam', maxMarks: 100 }
+  const assignments = [
+    { id: 'assignment1', name: 'Assignment 1', maxMarks: 100, type: 'assignment' },
+    { id: 'quiz1', name: 'Quiz 1', maxMarks: 50, type: 'quiz' },
+    { id: 'midterm', name: 'Mid Term Exam', maxMarks: 100, type: 'exam' },
+    { id: 'project', name: 'Final Project', maxMarks: 150, type: 'project' }
   ];
 
-  const students = [
-    { id: '1', name: 'John Doe', rollNo: 'CS21B1001' },
-    { id: '2', name: 'Jane Smith', rollNo: 'CS21B1002' },
-    { id: '3', name: 'Mike Johnson', rollNo: 'CS21B1003' },
-    { id: '4', name: 'Sarah Wilson', rollNo: 'CS21B1004' },
-    { id: '5', name: 'David Brown', rollNo: 'CS21B1005' }
-  ];
+  const [students, setStudents] = useState([
+    {
+      id: 'CS21B1001',
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      marks: { assignment1: 85, quiz1: 45, midterm: 78, project: null },
+      submitted: { assignment1: true, quiz1: true, midterm: true, project: false }
+    },
+    {
+      id: 'CS21B1002', 
+      name: 'Bob Smith',
+      email: 'bob@example.com',
+      marks: { assignment1: 92, quiz1: 48, midterm: 89, project: null },
+      submitted: { assignment1: true, quiz1: true, midterm: true, project: false }
+    },
+    {
+      id: 'CS21B1003',
+      name: 'Charlie Brown',
+      email: 'charlie@example.com', 
+      marks: { assignment1: 78, quiz1: 42, midterm: 85, project: null },
+      submitted: { assignment1: true, quiz1: true, midterm: true, project: false }
+    },
+    {
+      id: 'CS21B1004',
+      name: 'Diana Wilson',
+      email: 'diana@example.com',
+      marks: { assignment1: null, quiz1: 47, midterm: 92, project: null },
+      submitted: { assignment1: false, quiz1: true, midterm: true, project: false }
+    },
+    {
+      id: 'CS21B1005',
+      name: 'Eric Davis',
+      email: 'eric@example.com',
+      marks: { assignment1: 88, quiz1: null, midterm: 76, project: null },
+      submitted: { assignment1: true, quiz1: false, midterm: true, project: false }
+    }
+  ]);
 
-  const handleMarkChange = (studentId: string, mark: string) => {
-    setMarks(prev => ({ ...prev, [studentId]: mark }));
-  };
+  const handleMarkChange = (studentId: string, value: string) => {
+    const numValue = value === '' ? null : parseFloat(value);
+    const maxMarks = assignments.find(a => a.id === selectedAssignment)?.maxMarks || 100;
+    
+    if (numValue !== null && (numValue < 0 || numValue > maxMarks)) {
+      return; // Don't allow invalid marks
+    }
 
-  const calculateGrade = (mark: number, maxMarks: number) => {
-    const percentage = (mark / maxMarks) * 100;
-    if (percentage >= 90) return 'A+';
-    if (percentage >= 80) return 'A';
-    if (percentage >= 70) return 'B+';
-    if (percentage >= 60) return 'B';
-    if (percentage >= 50) return 'C';
-    return 'F';
+    setStudents(prev => prev.map(student => 
+      student.id === studentId 
+        ? { 
+            ...student, 
+            marks: { ...student.marks, [selectedAssignment]: numValue }
+          }
+        : student
+    ));
   };
 
   const handleSaveMarks = () => {
-    console.log('Saving marks:', marks);
-    // Add save logic here
+    console.log('Saving marks for:', selectedClass, selectedAssignment);
+    console.log('Student marks:', students.map(s => ({ id: s.id, mark: s.marks[selectedAssignment as keyof typeof s.marks] })));
   };
 
-  const selectedExamData = examTypes.find(exam => exam.id === selectedExam);
+  const handleBulkImport = () => {
+    console.log('Opening bulk import dialog');
+  };
+
+  const handleExportMarks = () => {
+    console.log('Exporting marks for:', selectedClass, selectedAssignment);
+  };
+
+  const getSelectedAssignment = () => assignments.find(a => a.id === selectedAssignment);
+  const submittedCount = students.filter(s => s.submitted[selectedAssignment as keyof typeof s.submitted]).length;
+  const gradedCount = students.filter(s => s.marks[selectedAssignment as keyof typeof s.marks] !== null).length;
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Mark Entry</h1>
+          <p className="text-gray-600">Enter and manage student grades</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleBulkImport}>
+            <Upload className="h-4 w-4 mr-2" />
+            Bulk Import
+          </Button>
+          <Button variant="outline" onClick={handleExportMarks}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {/* Class and Assignment Selection */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Select Class</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {classes.map((cls) => (
+                <button
+                  key={cls.code}
+                  onClick={() => setSelectedClass(cls.code)}
+                  className={`w-full p-3 text-left border rounded-lg transition-colors ${
+                    selectedClass === cls.code 
+                      ? 'bg-blue-50 border-blue-300' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="font-medium">{cls.code} - {cls.name}</div>
+                  <div className="text-sm text-gray-500">{cls.students} students</div>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Select Assignment</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {assignments.map((assignment) => (
+                <button
+                  key={assignment.id}
+                  onClick={() => setSelectedAssignment(assignment.id)}
+                  className={`w-full p-3 text-left border rounded-lg transition-colors ${
+                    selectedAssignment === assignment.id 
+                      ? 'bg-green-50 border-green-300' 
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">{assignment.name}</div>
+                      <div className="text-sm text-gray-500">Max: {assignment.maxMarks} marks</div>
+                    </div>
+                    <Badge variant="outline">{assignment.type}</Badge>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-bold">{students.length}</p>
+              </div>
+              <FileText className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Submitted</p>
+                <p className="text-2xl font-bold text-green-600">{submittedCount}</p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Graded</p>
+                <p className="text-2xl font-bold text-purple-600">{gradedCount}</p>
+              </div>
+              <Save className="h-8 w-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-2xl font-bold text-orange-600">{students.length - gradedCount}</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-orange-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Mark Entry Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Edit className="h-5 w-5" />
-            Mark Entry System
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <Label htmlFor="class-select">Select Class</Label>
-              <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map(cls => (
-                    <SelectItem key={cls.id} value={cls.id}>
-                      {cls.name} ({cls.students} students)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="exam-select">Select Exam/Assessment</Label>
-              <Select value={selectedExam} onValueChange={setSelectedExam}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose exam type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {examTypes.map(exam => (
-                    <SelectItem key={exam.id} value={exam.id}>
-                      {exam.name} (Max: {exam.maxMarks})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="flex justify-between items-center">
+            <CardTitle>
+              Mark Entry - {getSelectedAssignment()?.name} (Max: {getSelectedAssignment()?.maxMarks})
+            </CardTitle>
+            <div className="flex gap-2">
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                <Input placeholder="Search students..." className="pl-9 w-64" />
+              </div>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-
-          {selectedClass && selectedExam && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold">Enter Marks</h3>
-                  <Badge variant={isLocked ? 'destructive' : 'default'}>
-                    {isLocked ? 'Locked' : 'Editable'}
-                  </Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setIsLocked(!isLocked)}
-                    className="gap-1"
-                  >
-                    <Lock className="h-4 w-4" />
-                    {isLocked ? 'Unlock' : 'Lock'} Entry
-                  </Button>
-                  <Button 
-                    onClick={handleSaveMarks} 
-                    disabled={isLocked}
-                    className="gap-1"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save All Marks
-                  </Button>
-                </div>
-              </div>
-
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Roll No</TableHead>
-                    <TableHead>Student Name</TableHead>
-                    <TableHead>Marks (/{selectedExamData?.maxMarks})</TableHead>
-                    <TableHead>Grade</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {students.map(student => {
-                    const mark = parseInt(marks[student.id] || '0');
-                    const grade = mark > 0 ? calculateGrade(mark, selectedExamData?.maxMarks || 100) : '-';
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">Student ID</th>
+                    <th className="text-left p-2">Name</th>
+                    <th className="text-center p-2">Submitted</th>
+                    <th className="text-center p-2">Marks</th>
+                    <th className="text-center p-2">Percentage</th>
+                    <th className="text-center p-2">Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map((student) => {
+                    const currentMark = student.marks[selectedAssignment as keyof typeof student.marks];
+                    const maxMarks = getSelectedAssignment()?.maxMarks || 100;
+                    const percentage = currentMark ? Math.round((currentMark / maxMarks) * 100) : null;
+                    const isSubmitted = student.submitted[selectedAssignment as keyof typeof student.submitted];
                     
                     return (
-                      <TableRow key={student.id}>
-                        <TableCell className="font-medium">{student.rollNo}</TableCell>
-                        <TableCell>{student.name}</TableCell>
-                        <TableCell>
+                      <tr key={student.id} className="border-b hover:bg-gray-50">
+                        <td className="p-2 font-medium">{student.id}</td>
+                        <td className="p-2">{student.name}</td>
+                        <td className="p-2 text-center">
+                          {isSubmitted ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <AlertTriangle className="h-5 w-5 text-orange-600 mx-auto" />
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
                           <Input
                             type="number"
                             min="0"
-                            max={selectedExamData?.maxMarks}
-                            value={marks[student.id] || ''}
+                            max={maxMarks}
+                            value={currentMark || ''}
                             onChange={(e) => handleMarkChange(student.id, e.target.value)}
-                            disabled={isLocked}
-                            className="w-20"
-                            placeholder="0"
+                            className="w-20 text-center mx-auto"
+                            placeholder="--"
+                            disabled={!isSubmitted}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={grade === 'F' ? 'destructive' : grade.includes('A') ? 'default' : 'secondary'}>
-                            {grade}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
+                        </td>
+                        <td className="p-2 text-center">
+                          {percentage ? `${percentage}%` : '--'}
+                        </td>
+                        <td className="p-2 text-center">
+                          {percentage ? (
+                            <Badge variant={
+                              percentage >= 90 ? 'default' :
+                              percentage >= 80 ? 'secondary' :
+                              percentage >= 70 ? 'outline' : 'destructive'
+                            }>
+                              {percentage >= 90 ? 'A+' :
+                               percentage >= 80 ? 'A' :
+                               percentage >= 70 ? 'B+' :
+                               percentage >= 60 ? 'B' : 'F'}
+                            </Badge>
+                          ) : '--'}
+                        </td>
+                      </tr>
                     );
                   })}
-                </TableBody>
-              </Table>
+                </tbody>
+              </table>
             </div>
-          )}
+            
+            <div className="flex justify-between items-center pt-4">
+              <div className="text-sm text-gray-600">
+                {gradedCount} of {students.length} students graded
+              </div>
+              <Button onClick={handleSaveMarks} className="flex items-center gap-2">
+                <Save className="h-4 w-4" />
+                Save All Marks
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

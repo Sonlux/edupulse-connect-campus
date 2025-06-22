@@ -4,80 +4,87 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   User, 
+  Mail, 
+  Phone, 
+  Lock, 
   Bell, 
-  Shield, 
-  Palette, 
-  Globe, 
-  Download,
+  Eye, 
+  Shield,
   Upload,
-  Save,
-  Edit,
-  Camera
+  Save
 } from 'lucide-react';
 
 const UserSettings = () => {
   const { user } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || '',
+    firstName: user?.role === 'student' ? 'Alex' : user?.role === 'faculty' ? 'Dr. Sarah' : 'Administrator',
+    lastName: user?.role === 'student' ? 'Johnson' : user?.role === 'faculty' ? 'Wilson' : 'User',
     email: user?.email || '',
     phone: '+1 (555) 123-4567',
-    address: '123 University Ave, College Town, ST 12345',
-    bio: 'Computer Science student passionate about software development and machine learning.'
+    department: user?.role === 'faculty' ? 'Computer Science' : user?.role === 'student' ? 'Computer Science' : 'Administration',
+    studentId: user?.role === 'student' ? 'CS21B1045' : '',
+    facultyId: user?.role === 'faculty' ? 'FAC001' : '',
+    bio: 'Passionate about technology and learning.'
   });
 
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
     pushNotifications: true,
-    gradeUpdates: true,
-    attendanceAlerts: true,
     assignmentReminders: true,
-    facultyMessages: true
+    gradeUpdates: true,
+    classAnnouncements: true,
+    systemUpdates: false,
+    marketingEmails: false
   });
 
   const [privacy, setPrivacy] = useState({
     profileVisibility: 'public',
     showEmail: false,
     showPhone: false,
-    shareProgress: true
+    allowMessages: true,
+    showOnlineStatus: true
   });
 
-  const handleSaveProfile = () => {
-    console.log('Saving profile:', profileData);
-    setIsEditing(false);
+  const handleProfileUpdate = () => {
+    console.log('Updating profile:', profileData);
+    // Here you would typically make an API call to update the profile
   };
 
-  const handleExportData = () => {
-    console.log('Exporting user data...');
+  const handleNotificationUpdate = () => {
+    console.log('Updating notifications:', notifications);
+    // Here you would typically make an API call to update notification preferences
   };
 
-  const handleDeleteAccount = () => {
-    console.log('Account deletion requested...');
+  const handlePrivacyUpdate = () => {
+    console.log('Updating privacy settings:', privacy);
+    // Here you would typically make an API call to update privacy settings
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <Badge variant="outline">{user?.role}</Badge>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+          <p className="text-gray-600">Manage your account settings and preferences</p>
+        </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="privacy">Privacy</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
+        <TabsContent value="profile" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -87,111 +94,133 @@ const UserSettings = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Profile Picture */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                    {user?.name?.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
-                  >
-                    <Camera className="h-3 w-3" />
-                  </Button>
-                </div>
+              <div className="flex items-center gap-6">
+                <Avatar className="h-24 w-24">
+                  <AvatarFallback className="text-2xl">
+                    {profileData.firstName[0]}{profileData.lastName[0]}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
-                  <h3 className="font-semibold">{user?.name}</h3>
-                  <p className="text-sm text-gray-600">{user?.email}</p>
-                  {user?.studentId && (
-                    <Badge variant="outline" className="mt-1">
-                      ID: {user.studentId}
-                    </Badge>
-                  )}
-                  {user?.facultyId && (
-                    <Badge variant="outline" className="mt-1">
-                      ID: {user.facultyId}
-                    </Badge>
-                  )}
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload Photo
+                  </Button>
+                  <p className="text-sm text-gray-500 mt-2">JPG, PNG or GIF (max 5MB)</p>
                 </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="ml-auto gap-1"
-                >
-                  <Edit className="h-4 w-4" />
-                  {isEditing ? 'Cancel' : 'Edit Profile'}
-                </Button>
               </div>
 
-              {/* Profile Form */}
+              {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="firstName">First Name</Label>
                   <Input
-                    id="name"
-                    value={profileData.name}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                    disabled={!isEditing}
+                    id="firstName"
+                    value={profileData.firstName}
+                    onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={profileData.lastName}
+                    onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    type="email"
                     value={profileData.email}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                    disabled={!isEditing}
+                    onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     value={profileData.phone}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                    disabled={!isEditing}
+                    onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="department">Department</Label>
                   <Input
-                    id="address"
-                    value={profileData.address}
-                    onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
-                    disabled={!isEditing}
+                    id="department"
+                    value={profileData.department}
+                    onChange={(e) => setProfileData({...profileData, department: e.target.value})}
                   />
                 </div>
+                {user?.role === 'student' && (
+                  <div>
+                    <Label htmlFor="studentId">Student ID</Label>
+                    <Input
+                      id="studentId"
+                      value={profileData.studentId}
+                      onChange={(e) => setProfileData({...profileData, studentId: e.target.value})}
+                    />
+                  </div>
+                )}
+                {user?.role === 'faculty' && (
+                  <div>
+                    <Label htmlFor="facultyId">Faculty ID</Label>
+                    <Input
+                      id="facultyId"
+                      value={profileData.facultyId}
+                      onChange={(e) => setProfileData({...profileData, facultyId: e.target.value})}
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
                 <Label htmlFor="bio">Bio</Label>
                 <textarea
                   id="bio"
+                  className="w-full mt-1 p-2 border rounded-md"
                   rows={3}
                   value={profileData.bio}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                  disabled={!isEditing}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
                 />
               </div>
 
-              {isEditing && (
-                <div className="flex gap-2">
-                  <Button onClick={handleSaveProfile} className="gap-1">
-                    <Save className="h-4 w-4" />
-                    Save Changes
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsEditing(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              )}
+              <Button onClick={handleProfileUpdate} className="flex items-center gap-2">
+                <Save className="h-4 w-4" />
+                Save Profile
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="notifications" className="space-y-6">
+        <TabsContent value="account">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                Account Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Account Type</Label>
+                <p className="text-sm text-gray-600 capitalize">{user?.role}</p>
+              </div>
+              <div>
+                <Label>Member Since</Label>
+                <p className="text-sm text-gray-600">January 2024</p>
+              </div>
+              <div>
+                <Label>Account Status</Label>
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                  Active
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -199,202 +228,165 @@ const UserSettings = () => {
                 Notification Preferences
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="email-notifications">Email Notifications</Label>
-                    <p className="text-sm text-gray-600">Receive notifications via email</p>
+                    <Label>Email Notifications</Label>
+                    <p className="text-sm text-gray-500">Receive notifications via email</p>
                   </div>
                   <Switch
-                    id="email-notifications"
                     checked={notifications.emailNotifications}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, emailNotifications: checked }))
-                    }
+                    onCheckedChange={(checked) => setNotifications({...notifications, emailNotifications: checked})}
                   />
                 </div>
-
+                
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="push-notifications">Push Notifications</Label>
-                    <p className="text-sm text-gray-600">Receive push notifications in browser</p>
+                    <Label>Push Notifications</Label>
+                    <p className="text-sm text-gray-500">Receive push notifications in browser</p>
                   </div>
                   <Switch
-                    id="push-notifications"
                     checked={notifications.pushNotifications}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, pushNotifications: checked }))
-                    }
+                    onCheckedChange={(checked) => setNotifications({...notifications, pushNotifications: checked})}
                   />
                 </div>
-
+                
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="grade-updates">Grade Updates</Label>
-                    <p className="text-sm text-gray-600">Get notified when new grades are posted</p>
+                    <Label>Assignment Reminders</Label>
+                    <p className="text-sm text-gray-500">Get reminded about upcoming assignments</p>
                   </div>
                   <Switch
-                    id="grade-updates"
-                    checked={notifications.gradeUpdates}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, gradeUpdates: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="attendance-alerts">Attendance Alerts</Label>
-                    <p className="text-sm text-gray-600">Receive alerts for low attendance</p>
-                  </div>
-                  <Switch
-                    id="attendance-alerts"
-                    checked={notifications.attendanceAlerts}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, attendanceAlerts: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="assignment-reminders">Assignment Reminders</Label>
-                    <p className="text-sm text-gray-600">Get reminded about upcoming deadlines</p>
-                  </div>
-                  <Switch
-                    id="assignment-reminders"
                     checked={notifications.assignmentReminders}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, assignmentReminders: checked }))
-                    }
+                    onCheckedChange={(checked) => setNotifications({...notifications, assignmentReminders: checked})}
                   />
                 </div>
-
+                
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="faculty-messages">Faculty Messages</Label>
-                    <p className="text-sm text-gray-600">Receive messages from faculty</p>
+                    <Label>Grade Updates</Label>
+                    <p className="text-sm text-gray-500">Notifications when grades are posted</p>
                   </div>
                   <Switch
-                    id="faculty-messages"
-                    checked={notifications.facultyMessages}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, facultyMessages: checked }))
-                    }
+                    checked={notifications.gradeUpdates}
+                    onCheckedChange={(checked) => setNotifications({...notifications, gradeUpdates: checked})}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Class Announcements</Label>
+                    <p className="text-sm text-gray-500">Updates from instructors</p>
+                  </div>
+                  <Switch
+                    checked={notifications.classAnnouncements}
+                    onCheckedChange={(checked) => setNotifications({...notifications, classAnnouncements: checked})}
                   />
                 </div>
               </div>
+              
+              <Button onClick={handleNotificationUpdate} className="flex items-center gap-2">
+                <Save className="h-4 w-4" />
+                Save Preferences
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="privacy" className="space-y-6">
+        <TabsContent value="privacy">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Privacy Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Show Email Address</Label>
+                    <p className="text-sm text-gray-500">Allow others to see your email</p>
+                  </div>
+                  <Switch
+                    checked={privacy.showEmail}
+                    onCheckedChange={(checked) => setPrivacy({...privacy, showEmail: checked})}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Show Phone Number</Label>
+                    <p className="text-sm text-gray-500">Allow others to see your phone</p>
+                  </div>
+                  <Switch
+                    checked={privacy.showPhone}
+                    onCheckedChange={(checked) => setPrivacy({...privacy, showPhone: checked})}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Allow Messages</Label>
+                    <p className="text-sm text-gray-500">Let others send you messages</p>
+                  </div>
+                  <Switch
+                    checked={privacy.allowMessages}
+                    onCheckedChange={(checked) => setPrivacy({...privacy, allowMessages: checked})}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Show Online Status</Label>
+                    <p className="text-sm text-gray-500">Show when you're online</p>
+                  </div>
+                  <Switch
+                    checked={privacy.showOnlineStatus}
+                    onCheckedChange={(checked) => setPrivacy({...privacy, showOnlineStatus: checked})}
+                  />
+                </div>
+              </div>
+              
+              <Button onClick={handlePrivacyUpdate} className="flex items-center gap-2">
+                <Save className="h-4 w-4" />
+                Save Privacy Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="security">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Privacy Settings
+                Security Settings
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="profile-visibility">Profile Visibility</Label>
-                  <select 
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm mt-1"
-                    value={privacy.profileVisibility}
-                    onChange={(e) => setPrivacy(prev => ({ ...prev, profileVisibility: e.target.value }))}
-                  >
-                    <option value="public">Public</option>
-                    <option value="students">Students Only</option>
-                    <option value="faculty">Faculty Only</option>
-                    <option value="private">Private</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="show-email">Show Email Address</Label>
-                    <p className="text-sm text-gray-600">Make your email visible to others</p>
-                  </div>
-                  <Switch
-                    id="show-email"
-                    checked={privacy.showEmail}
-                    onCheckedChange={(checked) => 
-                      setPrivacy(prev => ({ ...prev, showEmail: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="show-phone">Show Phone Number</Label>
-                    <p className="text-sm text-gray-600">Make your phone number visible to others</p>
-                  </div>
-                  <Switch
-                    id="show-phone"
-                    checked={privacy.showPhone}
-                    onCheckedChange={(checked) => 
-                      setPrivacy(prev => ({ ...prev, showPhone: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="share-progress">Share Academic Progress</Label>
-                    <p className="text-sm text-gray-600">Allow others to see your academic achievements</p>
-                  </div>
-                  <Switch
-                    id="share-progress"
-                    checked={privacy.shareProgress}
-                    onCheckedChange={(checked) => 
-                      setPrivacy(prev => ({ ...prev, shareProgress: checked }))
-                    }
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="account" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Management</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium mb-2">Change Password</h3>
-                  <div className="grid gap-4">
+                  <Label>Change Password</Label>
+                  <div className="space-y-2 mt-2">
                     <Input type="password" placeholder="Current Password" />
                     <Input type="password" placeholder="New Password" />
                     <Input type="password" placeholder="Confirm New Password" />
-                    <Button className="w-fit">Update Password</Button>
                   </div>
+                  <Button className="mt-2">Update Password</Button>
                 </div>
-
+                
                 <div className="border-t pt-4">
-                  <h3 className="font-medium mb-2">Data Export</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Download all your data including grades, attendance, and assignments.
-                  </p>
-                  <Button variant="outline" onClick={handleExportData} className="gap-1">
-                    <Download className="h-4 w-4" />
-                    Export My Data
-                  </Button>
+                  <Label>Two-Factor Authentication</Label>
+                  <p className="text-sm text-gray-500 mb-2">Add an extra layer of security to your account</p>
+                  <Button variant="outline">Enable 2FA</Button>
                 </div>
-
+                
                 <div className="border-t pt-4">
-                  <h3 className="font-medium mb-2 text-red-600">Danger Zone</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Once you delete your account, there is no going back. Please be certain.
-                  </p>
-                  <Button variant="destructive" onClick={handleDeleteAccount}>
-                    Delete Account
-                  </Button>
+                  <Label>Active Sessions</Label>
+                  <p className="text-sm text-gray-500 mb-2">Manage your active login sessions</p>
+                  <Button variant="outline">View Sessions</Button>
                 </div>
               </div>
             </CardContent>

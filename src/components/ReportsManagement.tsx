@@ -3,295 +3,269 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
 import { 
   BarChart3, 
   Download, 
-  Users, 
-  TrendingUp, 
+  Filter,
   Calendar,
+  Users,
+  TrendingUp,
   FileText,
-  Award,
-  AlertTriangle
+  PieChart,
+  LineChart
 } from 'lucide-react';
 
 const ReportsManagement = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState('current-semester');
   const [selectedClass, setSelectedClass] = useState('all');
-  const [selectedPeriod, setSelectedPeriod] = useState('semester');
+
+  const classes = ['All Classes', 'CS201 - Data Structures', 'CS202 - Database Systems', 'CS203 - Web Development'];
+  const periods = [
+    { value: 'current-semester', label: 'Current Semester' },
+    { value: 'last-month', label: 'Last Month' },
+    { value: 'last-semester', label: 'Last Semester' },
+    { value: 'academic-year', label: 'Academic Year' }
+  ];
 
   const attendanceData = [
-    { subject: 'Data Structures', average: 87, excellent: 15, good: 10, poor: 5 },
-    { subject: 'Database Systems', average: 82, excellent: 12, good: 15, poor: 5 },
-    { subject: 'Web Development', average: 78, excellent: 10, good: 12, poor: 10 },
-    { subject: 'Computer Networks', average: 85, excellent: 18, good: 10, poor: 4 },
-    { subject: 'Software Engineering', average: 90, excellent: 20, good: 8, poor: 4 }
+    { class: 'CS201', present: 42, total: 50, percentage: 84 },
+    { class: 'CS202', present: 38, total: 45, percentage: 84.4 },
+    { class: 'CS203', present: 32, total: 42, percentage: 76.2 }
   ];
 
   const gradeDistribution = [
-    { grade: 'A+', count: 45, percentage: 28 },
-    { grade: 'A', count: 38, percentage: 24 },
-    { grade: 'B+', count: 32, percentage: 20 },
-    { grade: 'B', count: 25, percentage: 16 },
-    { grade: 'C+', count: 15, percentage: 9 },
-    { grade: 'C', count: 5, percentage: 3 }
+    { grade: 'A+', count: 15, percentage: 25 },
+    { grade: 'A', count: 18, percentage: 30 },
+    { grade: 'B+', count: 12, percentage: 20 },
+    { grade: 'B', count: 10, percentage: 16.7 },
+    { grade: 'C', count: 3, percentage: 5 },
+    { grade: 'F', count: 2, percentage: 3.3 }
   ];
 
-  const performanceTrend = [
-    { month: 'Aug', attendance: 85, avgGrade: 7.8 },
-    { month: 'Sep', attendance: 78, avgGrade: 8.1 },
-    { month: 'Oct', attendance: 92, avgGrade: 8.5 },
-    { month: 'Nov', attendance: 88, avgGrade: 8.3 },
-    { month: 'Dec', attendance: 82, avgGrade: 8.0 },
-    { month: 'Jan', attendance: 87, avgGrade: 8.4 }
+  const performanceMetrics = {
+    totalStudents: 137,
+    averageAttendance: 84.8,
+    averageGrade: 82.5,
+    assignmentsCompleted: 78,
+    classesHeld: 45,
+    improvementRate: 12.3
+  };
+
+  const topPerformers = [
+    { name: 'Alice Johnson', class: 'CS201', grade: 96, attendance: 98 },
+    { name: 'Diana Wilson', class: 'CS202', grade: 94, attendance: 96 },
+    { name: 'Bob Smith', class: 'CS201', grade: 92, attendance: 88 },
+    { name: 'Emma Davis', class: 'CS203', grade: 89, attendance: 94 },
+    { name: 'Frank Miller', class: 'CS202', grade: 87, attendance: 92 }
   ];
 
-  const classStatistics = [
-    { className: 'CS-A', students: 30, avgAttendance: 87, avgGrade: 8.2, topPerformer: 'John Doe' },
-    { className: 'CS-B', students: 32, avgAttendance: 82, avgGrade: 7.9, topPerformer: 'Jane Smith' },
-    { className: 'CS-C', students: 28, avgAttendance: 90, avgGrade: 8.5, topPerformer: 'Mike Johnson' }
+  const needsAttention = [
+    { name: 'Eric Davis', class: 'CS203', grade: 65, attendance: 71, issue: 'Low attendance' },
+    { name: 'Grace Kim', class: 'CS201', grade: 58, attendance: 68, issue: 'Poor performance' },
+    { name: 'Henry Brown', class: 'CS202', grade: 62, attendance: 74, issue: 'Missing assignments' }
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+  const getGradeColor = (grade: number) => {
+    if (grade >= 90) return 'text-green-600 bg-green-100';
+    if (grade >= 80) return 'text-blue-600 bg-blue-100';
+    if (grade >= 70) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
+  };
 
-  const handleExportReport = (type: string) => {
-    console.log(`Exporting ${type} report`);
+  const getAttendanceColor = (percentage: number) => {
+    if (percentage >= 90) return 'text-green-600 bg-green-100';
+    if (percentage >= 80) return 'text-blue-600 bg-blue-100';
+    if (percentage >= 75) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Academic Reports & Analytics</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
+          <p className="text-gray-600">Analyze student performance and class metrics</p>
+        </div>
         <div className="flex gap-2">
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select class" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Classes</SelectItem>
-              <SelectItem value="cs-a">CS-A</SelectItem>
-              <SelectItem value="cs-b">CS-B</SelectItem>
-              <SelectItem value="cs-c">CS-C</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="semester">This Semester</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+          <Button>
+            <Download className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Filter Controls */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Time Period</label>
+              <select 
+                className="w-full mt-1 border rounded px-3 py-2"
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+              >
+                {periods.map(period => (
+                  <option key={period.value} value={period.value}>{period.label}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium text-gray-700">Class</label>
+              <select 
+                className="w-full mt-1 border rounded px-3 py-2"
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+              >
+                {classes.map((cls, index) => (
+                  <option key={index} value={cls.toLowerCase()}>{cls}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium text-gray-700">Report Type</label>
+              <select className="w-full mt-1 border rounded px-3 py-2">
+                <option>Comprehensive Report</option>
+                <option>Attendance Report</option>
+                <option>Grade Report</option>
+                <option>Performance Report</option>
+              </select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">90</div>
-            <p className="text-xs text-muted-foreground">
-              Across all classes
-            </p>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+              <p className="text-2xl font-bold">{performanceMetrics.totalStudents}</p>
+              <p className="text-sm text-gray-600">Total Students</p>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Attendance</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">86.2%</div>
-            <p className="text-xs text-muted-foreground">
-              +2.1% from last month
-            </p>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Calendar className="h-8 w-8 mx-auto mb-2 text-green-600" />
+              <p className="text-2xl font-bold">{performanceMetrics.averageAttendance}%</p>
+              <p className="text-sm text-gray-600">Avg Attendance</p>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Grade</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8.15</div>
-            <p className="text-xs text-muted-foreground">
-              CGPA scale
-            </p>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+              <p className="text-2xl font-bold">{performanceMetrics.averageGrade}%</p>
+              <p className="text-sm text-gray-600">Avg Grade</p>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">At-Risk Students</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">12</div>
-            <p className="text-xs text-muted-foreground">
-              Below 75% attendance
-            </p>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <FileText className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+              <p className="text-2xl font-bold">{performanceMetrics.assignmentsCompleted}%</p>
+              <p className="text-sm text-gray-600">Assignments</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <BarChart3 className="h-8 w-8 mx-auto mb-2 text-indigo-600" />
+              <p className="text-2xl font-bold">{performanceMetrics.classesHeld}</p>
+              <p className="text-sm text-gray-600">Classes Held</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-emerald-600" />
+              <p className="text-2xl font-bold">+{performanceMetrics.improvementRate}%</p>
+              <p className="text-sm text-gray-600">Improvement</p>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="attendance" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="attendance">Attendance Reports</TabsTrigger>
-          <TabsTrigger value="grades">Grade Analysis</TabsTrigger>
-          <TabsTrigger value="performance">Performance Trends</TabsTrigger>
-          <TabsTrigger value="class-stats">Class Statistics</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance</TabsTrigger>
+          <TabsTrigger value="grades">Grades</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="custom">Custom</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="attendance" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Subject-wise Attendance Analysis</CardTitle>
-                <Button onClick={() => handleExportReport('attendance')} variant="outline" className="gap-1">
-                  <Download className="h-4 w-4" />
-                  Export Report
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={attendanceData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="subject" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="average" fill="#3b82f6" name="Average %" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
+        <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Top Performers */}
             <Card>
               <CardHeader>
-                <CardTitle>Attendance Categories</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  Top Performers
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {attendanceData.map((subject, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">{subject.subject}</span>
-                        <span>{subject.average}% avg</span>
-                      </div>
-                      <div className="flex gap-1 h-2">
-                        <div 
-                          className="bg-green-500 rounded" 
-                          style={{ width: `${(subject.excellent / 30) * 100}%` }}
-                        />
-                        <div 
-                          className="bg-blue-500 rounded" 
-                          style={{ width: `${(subject.good / 30) * 100}%` }}
-                        />
-                        <div 
-                          className="bg-red-500 rounded" 
-                          style={{ width: `${(subject.poor / 30) * 100}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-600">
-                        <span>Excellent: {subject.excellent}</span>
-                        <span>Good: {subject.good}</span>
-                        <span>Poor: {subject.poor}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Attendance Trends</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={performanceTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="attendance" stroke="#3b82f6" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="grades" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Grade Distribution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={gradeDistribution}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ grade, percentage }) => `${grade}: ${percentage}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="count"
-                    >
-                      {gradeDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Grade Statistics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {gradeDistribution.map((grade, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-4 h-4 rounded"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                        />
-                        <span className="font-medium">Grade {grade.grade}</span>
+                <div className="space-y-3">
+                  {topPerformers.map((student, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{student.name}</p>
+                        <p className="text-sm text-gray-600">{student.class}</p>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold">{grade.count} students</div>
-                        <div className="text-sm text-gray-600">{grade.percentage}%</div>
+                        <Badge className={getGradeColor(student.grade)}>
+                          {student.grade}%
+                        </Badge>
+                        <p className="text-xs text-gray-500 mt-1">{student.attendance}% attendance</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Students Needing Attention */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-red-600" />
+                  Needs Attention
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {needsAttention.map((student, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{student.name}</p>
+                        <p className="text-sm text-gray-600">{student.class}</p>
+                        <p className="text-xs text-red-600">{student.issue}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge className={getGradeColor(student.grade)}>
+                          {student.grade}%
+                        </Badge>
+                        <p className="text-xs text-gray-500 mt-1">{student.attendance}% attendance</p>
                       </div>
                     </div>
                   ))}
@@ -299,64 +273,101 @@ const ReportsManagement = () => {
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4">
+          {/* Grade Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Performance Trends Over Time</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="h-5 w-5" />
+                Grade Distribution
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={performanceTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis yAxisId="left" />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip />
-                  <Line yAxisId="left" type="monotone" dataKey="attendance" stroke="#3b82f6" strokeWidth={2} name="Attendance %" />
-                  <Line yAxisId="right" type="monotone" dataKey="avgGrade" stroke="#10b981" strokeWidth={2} name="Average Grade" />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {gradeDistribution.map((grade, index) => (
+                  <div key={index} className="text-center p-4 border rounded-lg">
+                    <div className="text-2xl font-bold mb-1">{grade.count}</div>
+                    <div className="text-sm text-gray-600 mb-1">Grade {grade.grade}</div>
+                    <div className="text-xs text-gray-500">{grade.percentage}%</div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="class-stats" className="space-y-4">
+        <TabsContent value="attendance">
           <Card>
             <CardHeader>
-              <CardTitle>Class-wise Performance</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Attendance Analytics
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {classStatistics.map((cls, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-lg">{cls.className}</h3>
-                      <Badge variant="outline">{cls.students} students</Badge>
+                {attendanceData.map((classData, index) => (
+                  <div key={index} className="flex justify-between items-center p-4 border rounded-lg">
+                    <div>
+                      <h3 className="font-semibold">{classData.class}</h3>
+                      <p className="text-sm text-gray-600">{classData.present}/{classData.total} students present</p>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600">Avg Attendance</p>
-                        <p className="font-bold text-lg">{cls.avgAttendance}%</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Avg Grade</p>
-                        <p className="font-bold text-lg">{cls.avgGrade}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Top Performer</p>
-                        <p className="font-medium">{cls.topPerformer}</p>
-                      </div>
-                      <div>
-                        <Button size="sm" variant="outline" className="gap-1">
-                          <FileText className="h-3 w-3" />
-                          Detailed Report
-                        </Button>
-                      </div>
-                    </div>
+                    <Badge className={getAttendanceColor(classData.percentage)}>
+                      {classData.percentage}%
+                    </Badge>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="grades">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Grade Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p className="text-gray-600">Detailed grade analytics and trends will be displayed here</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LineChart className="h-5 w-5" />
+                Performance Trends
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <LineChart className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p className="text-gray-600">Performance trends and comparative analysis will be shown here</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="custom">
+          <Card>
+            <CardHeader>
+              <CardTitle>Custom Reports</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p className="text-gray-600">Custom report builder will be available here</p>
+                <Button className="mt-4">
+                  Create Custom Report
+                </Button>
               </div>
             </CardContent>
           </Card>
