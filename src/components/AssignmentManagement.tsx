@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,8 @@ import {
   AlertTriangle,
   Plus,
   Eye,
-  Edit
+  Edit,
+  Award
 } from 'lucide-react';
 
 const AssignmentManagement = () => {

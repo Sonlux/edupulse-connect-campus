@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,8 @@ import {
   Clock,
   Paperclip,
   Phone,
-  Video
+  Video,
+  Users
 } from 'lucide-react';
 
 const MessagingSystem = () => {
